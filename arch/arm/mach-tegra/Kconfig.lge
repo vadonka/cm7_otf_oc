@@ -1,0 +1,182 @@
+choice
+       prompt "HW Revision"
+       config MACH_STAR_TMUS
+       bool "STAR TMUS (p999)"
+       depends on MACH_STAR
+       config MACH_STAR_REV_F
+       bool "STAR Rev.F (p990)"
+       depends on MACH_STAR
+endchoice
+
+config STAR_PMIC
+	bool "star pmic test"
+	depends on MACH_STAR
+	default y
+
+config STAR_HIDDEN_RESET
+	bool "star hidden reset"
+	depends on MACH_STAR
+	default n
+
+menuconfig LPRINTK
+        bool "LGE Debugging Message"
+        depends on MACH_STAR && DEBUG_FS
+
+config FAKE_SHMOO
+	bool "Tegra2 Overclocking Enable"
+	depends on MACH_STAR
+	default y
+
+config CPU_REL_REQ
+	bool "Tegra2 Core and CPU Voltage Rel. Reqs."
+	depends on MACH_STAR
+	default y
+
+config BOOST_PERIPHERALS
+	bool "Tegra2 Overclocking Peripheral Enable"
+	depends on MACH_STAR
+	default y
+
+config MAX_AVP_OC_FREQ
+	int "AVP Overclock Frequency"
+	default 280000
+	depends on FAKE_SHMOO || BOOST_PERIPHERALS
+
+config MAX_GPU_OC_FREQ
+	int "3D GPU Overclock Frequency"
+	default 350000
+	depends on FAKE_SHMOO || BOOST_PERIPHERALS
+
+config MAX_DDR_OC_FREQ
+	int "Maximum DDR Overclock Frequency"
+	default 350000
+	depends on FAKE_SHMOO || BOOST_PERIPHERALS
+
+config DDR2_SDRAM_FREQ
+	int "DDR Overclock Frequency"
+	default 350000 if BOOST_PERIPHERALS
+	default 300000
+
+menuconfig SPICA_OTF
+	bool "On The Fly ToolKit (C) Spica"
+	default y
+
+if SPICA_OTF
+
+config OTF_AVP
+	bool "OTF AVP Frequency"
+	default y
+
+config OTF_GPU
+	bool "OTF GPU Frequency"
+	default y
+
+config OTF_VDE
+	bool "OTF VDE Frequency"
+	default y
+
+config OTF_DDR2MIN
+	bool "OTF DDR2 Min Frequency"
+	default y
+
+config OTF_LPDDR2
+	bool "OTF LPDDR2 Min Frequency"
+	default y
+
+config OTF_CPU1
+	bool "OTF CPU Second Core activation"
+	default y
+
+config OTF_MAXSCOFF
+	bool "OTF Screen Off Max Frequency"
+	default y
+
+config OTF_PSNIT
+	bool "OTF Extra: PowerSave & Nitro feature"
+	default y
+
+config OTF_BATTPROT
+	bool "OTF Extra: Battery Overheat Protection"
+	default y
+
+endif # SPICA_OTF
+
+if LPRINTK
+config  LPRINTK_ALL
+        bool "Select All Devices"
+        select LPRINTK_KERNEL
+        select LPRINTK_SD
+        select LPRINTK_KEY
+        select LPRINTK_FS
+        select LPRINTK_LCD
+        select LPRINTK_CAMERA
+        select LPRINTK_AUDIO
+        select LPRINTK_TOUCH
+        select LPRINTK_USB
+        select LPRINTK_BATT
+        select LPRINTK_CHARGER
+        select LPRINTK_POWER
+        select LPRINTK_WIFI
+        select LPRINTK_SENSOR
+        select LPRINTK_BT
+        select LPRINTK_FM
+        select LPRINTK_GPIO
+        select LPRINTK_MUIC
+        select LPRINTK_MES
+        select LPRINTK_SPI
+        select LPRINTK_MUX
+        select LPRINTK_RIL
+        select LPRINTK_PROXI
+
+        comment "Select individual device for debugging"
+        depends on !LPRINTK_ALL
+
+        config LPRINTK_KERNEL
+        bool "Kernel"
+        config LPRINTK_SD
+        bool "SD"
+        config LPRINTK_KEY
+        bool "Keypad"
+        config LPRINTK_FS
+        bool "File System"
+        config LPRINTK_LCD
+        bool "Display"
+        config LPRINTK_CAMERA
+        bool "Camera"
+        config LPRINTK_AUDIO
+        bool "Audio"
+        config LPRINTK_TOUCH
+        bool "Touch Screen"
+        config LPRINTK_USB
+        bool "USB"
+        config LPRINTK_BATT
+        bool "Battery"
+        config LPRINTK_CHARGER
+        bool "Charger"
+        config LPRINTK_POWER
+        bool "Power"
+        config LPRINTK_WIFI
+        bool "WIFI"
+        config LPRINTK_SENSOR
+        bool "Sensor"
+        config LPRINTK_BT
+        bool "Bluetooth"
+        config LPRINTK_FM
+        bool "FM Radio"
+        config LPRINTK_GPIO
+        bool "GPIO"
+        config LPRINTK_MUIC
+        bool "MUIC"
+        config LPRINTK_MES
+        bool "MES"
+        config LPRINTK_SPI
+        bool "SPI"
+        config LPRINTK_MUX
+        bool "MUX"
+        config LPRINTK_RIL
+        bool "RIL"
+        config LPRINTK_PROXI
+        bool "PROXI"
+
+endif # LPRINTK
+source "drivers/star/Kconfig"
