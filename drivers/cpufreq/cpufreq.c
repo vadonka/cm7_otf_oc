@@ -79,13 +79,11 @@ int maxsm_procfile_write(struct file *file, const char *buffer, unsigned long co
 	int temp_sm;
 	temp_sm = 0;
 
-	if (sscanf(buffer,"%d",&temp_sm) < 1) {
+	if ( sscanf(buffer,"%d",&temp_sm) < 1 )
 		return procfs_buffer_size_sm;
-	}
 
-	if (temp_sm < SMFREQLOW || temp_sm > SMFREQHIGH) {
+	if ( temp_sm < SMFREQLOW || temp_sm > SMFREQHIGH )
 		return procfs_buffer_size_sm;
-	}
 
 	procfs_buffer_size_sm = count;
 

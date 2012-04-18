@@ -75,13 +75,11 @@ int cpuon_procfile_write(struct file *file, const char *buffer, unsigned long co
 	int temp_cpuon;
 	temp_cpuon = 0;
 
-	if (sscanf(buffer,"%d",&temp_cpuon) < 1) {
+	if ( sscanf(buffer,"%d",&temp_cpuon) < 1 )
 		return procfs_buffer_size_cpuon;
-	}
 
-	if (temp_cpuon < ONMINLOW || temp_cpuon > ONMINHIGH) {
+	if ( temp_cpuon < ONMINLOW || temp_cpuon > ONMINHIGH )
 		return procfs_buffer_size_cpuon;
-	}
 
 	procfs_buffer_size_cpuon = count;
 
@@ -159,13 +157,11 @@ int ddr_procfile_write(struct file *file, const char *buffer, unsigned long coun
 	int temp_ddr2;
 	temp_ddr2 = 0;
 
-	if (sscanf(buffer,"%d",&temp_ddr2) < 1) {
+	if ( sscanf(buffer,"%d",&temp_ddr2) < 1 )
 		return procfs_buffer_size_ddr2;
-	}
 
-	if (temp_ddr2 < DDR2MINLOW || temp_ddr2 > DDR2MINHIGH) {
+	if ( temp_ddr2 < DDR2MINLOW || temp_ddr2 > DDR2MINHIGH )
 		return procfs_buffer_size_ddr2;
-	}
 
 	procfs_buffer_size_ddr2 = count;
 
@@ -243,13 +239,11 @@ int lpddr2_procfile_write(struct file *file, const char *buffer, unsigned long c
 	int temp_lpddr2;
 	temp_lpddr2 = 0;
 
-	if (sscanf(buffer,"%d",&temp_lpddr2) < 1) {
+	if ( sscanf(buffer,"%d",&temp_lpddr2) < 1 )
 		return procfs_buffer_size_lpddr2;
-	}
 
-	if (temp_lpddr2 < LPDDR2MINLOW || temp_lpddr2 > LPDDR2MINHIGH) {
+	if ( temp_lpddr2 < LPDDR2MINLOW || temp_lpddr2 > LPDDR2MINHIGH )
 		return procfs_buffer_size_lpddr2;
-	}
 
 	procfs_buffer_size_lpddr2 = count;
 
@@ -697,11 +691,23 @@ NvRmPrivAp20GetPmRequest(
     // - use fixed values if they are defined explicitly, otherwise
     // - set CPU1 OffMax threshold at 2/3 of cpu frequency range,
     //   and half of that frequency as CPU1 OnMin threshold
+    if ((s_Cpu1OffMaxKHz == 0) && (s_Cpu1OnMinKHz == 0))
+    {
         NvRmFreqKHz MaxKHz =
             NvRmPrivGetSocClockLimits(NvRmModuleID_Cpu)->MaxKHz;
 
+#ifdef CONFIG_OTF_CPU1
         s_Cpu1OnMinKHz = NVRM_CPU1_ON_MIN_KHZ;
         s_Cpu1OffMaxKHz = NVRM_CPU1_OFF_MAX_KHZ;
+#else
+        s_Cpu1OnMinKHz = NVRM_CPU1_ON_MIN_KHZ ?
+                         NVRM_CPU1_ON_MIN_KHZ : (MaxKHz / 3);
+        s_Cpu1OffMaxKHz = NVRM_CPU1_OFF_MAX_KHZ ?
+                          NVRM_CPU1_OFF_MAX_KHZ : (2 * MaxKHz / 3);
+        NV_ASSERT(s_Cpu1OnMinKHz < s_Cpu1OffMaxKHz);
+#endif /* OTF_CPU1 */
+
+    }
 
     // Timestamp
     if (s_pTimerUs == NULL)
