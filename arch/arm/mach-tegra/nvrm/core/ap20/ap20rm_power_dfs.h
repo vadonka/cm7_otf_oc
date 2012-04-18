@@ -246,16 +246,14 @@ extern "C"
  * If thresholds are set to 0, the values are derived at run time from the
  * characterization data
  */
-#ifdef CONFIG_OTF_CPU1
+#ifndef CONFIG_OTF_CPU1
 #include <linux/spica.h>
-#define NVRM_CPU1_ON_PENDING_MS (2500)
-#else
 #define NVRM_CPU1_ON_MIN_KHZ (0)
 #define NVRM_CPU1_OFF_MAX_KHZ (0)
+#endif /* OTF_CPU1 */
 
 #define NVRM_CPU1_ON_PENDING_MS (1500)
 #define NVRM_CPU1_OFF_PENDING_MS (1000)
-#endif /* OTF_CPU1 */
 
 /*
  * Defines AP20 Thermal policy parameters.
@@ -276,9 +274,9 @@ extern "C"
  * ODM should also set a critical threshold to trigger h/w shutdown
  * mechanism.
  */
-#define NVRM_DTT_DEGREES_HIGH           (95L)
-#define NVRM_DTT_DEGREES_LOW            (65L)
-#define NVRM_DTT_DEGREES_HYSTERESIS     (8L)
+#define NVRM_DTT_DEGREES_HIGH           (90L)
+#define NVRM_DTT_DEGREES_LOW            (60L)
+#define NVRM_DTT_DEGREES_HYSTERESIS     (5L)
 
 #define NVRM_DTT_VOLTAGE_THROTTLE_MV    (NvRmVoltsMaximum)
 #define NVRM_DTT_CPU_DELTA_KHZ          (100000UL)
