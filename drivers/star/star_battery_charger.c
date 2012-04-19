@@ -40,6 +40,28 @@ unsigned int oldavp_batt;
 unsigned int oldgpu_batt;
 unsigned int oldvde_batt;
 unsigned int oldsmfreq_batt;
+
+void otf_prot_activate()
+{
+    oldavp_batt = AVPFREQ;
+    oldgpu_batt = GPUFREQ;
+    oldvde_batt = VDEFREQ;
+    oldsmfreq_batt = SCREENOFFFREQ;
+    printk(KERN_ALERT "WARNING: Battery Critical Overheat! Activating protection!\n");
+    AVPFREQ = AVPLOW;
+    GPUFREQ = GPULOW;
+    VDEFREQ = VDELOW;
+    SCREENOFFFREQ = SMFREQLOW;
+}
+
+void otf_prot_deactivate()
+{
+    printk(KERN_INFO "Battery Cold. DeActivating protection.\n");
+    AVPFREQ = oldavp_batt;
+    GPUFREQ = oldgpu_batt;
+    VDEFREQ = oldvde_batt;
+    SCREENOFFFREQ = oldsmfreq_batt;
+}
 #endif
 
 #include "nvcommon.h"
@@ -2276,15 +2298,7 @@ static void charger_control_with_battery_temp(void)
 						charging_ic_deactive_for_rechrge();
 						batt_dev->charger_state_machine = CHARGER_STATE_SHUTDOWN;
 #ifdef CONFIG_OTF_BATTPROT
-oldavp_batt = AVPFREQ;
-oldgpu_batt = GPUFREQ;
-oldvde_batt = VDEFREQ;
-oldsmfreq_batt = SCREENOFFFREQ;
-printk(KERN_ALERT "WARNING: Battery Critical Overheat! Activating protection!\n");
-AVPFREQ = AVPLOW;
-GPUFREQ = GPULOW;
-VDEFREQ = VDELOW;
-SCREENOFFFREQ = SMFREQLOW;
+otf_prot_activate();
 #endif
 					}
 				}
@@ -2305,15 +2319,7 @@ SCREENOFFFREQ = SMFREQLOW;
 							batt_dev->charger_state_machine = CHARGER_STATE_CHARGE;
 							charging_ic_active_for_recharge(CHG_IC_DEFAULT_MODE);
 #ifdef CONFIG_OTF_BATTPROT
-oldavp_batt = AVPFREQ;
-oldgpu_batt = GPUFREQ;
-oldvde_batt = VDEFREQ;
-oldsmfreq_batt = SCREENOFFFREQ;
-printk(KERN_ALERT "WARNING: Not Critical Battery Overheat! Activating protection!\n");
-AVPFREQ = 240000;
-GPUFREQ = 300000;
-VDEFREQ = 650000;
-SCREENOFFFREQ = 324000;
+otf_prot_activate();
 #endif
 						}
 					}
@@ -2333,11 +2339,7 @@ SCREENOFFFREQ = 324000;
 				else
 					batt_dev->batt_health = POWER_SUPPLY_HEALTH_GOOD;
 #ifdef CONFIG_OTF_BATTPROT
-printk(KERN_INFO "Battery Cold. DeActivating protection.\n");
-AVPFREQ = oldavp_batt;
-GPUFREQ = oldgpu_batt;
-VDEFREQ = oldvde_batt;
-SCREENOFFFREQ = oldsmfreq_batt;
+otf_prot_deactivate();
 #endif
 			}
 			break;
@@ -2355,15 +2357,7 @@ SCREENOFFFREQ = oldsmfreq_batt;
 						charging_ic_deactive_for_rechrge();
 						batt_dev->charger_state_machine = CHARGER_STATE_SHUTDOWN;
 #ifdef CONFIG_OTF_BATTPROT
-oldavp_batt = AVPFREQ;
-oldgpu_batt = GPUFREQ;
-oldvde_batt = VDEFREQ;
-oldsmfreq_batt = SCREENOFFFREQ;
-printk(KERN_ALERT "WARNING: Battery Critical Overheat! Activating protection!\n");
-AVPFREQ = AVPLOW;
-GPUFREQ = GPULOW;
-VDEFREQ = VDELOW;
-SCREENOFFFREQ = SMFREQLOW;
+otf_prot_activate();
 #endif
 					}
 				}
@@ -2383,11 +2377,7 @@ SCREENOFFFREQ = SMFREQLOW;
 							batt_dev->charger_state_machine = CHARGER_STATE_CHARGE;
 							charging_ic_active_for_recharge(batt_dev->charger_setting_chcomp);
 #ifdef CONFIG_OTF_BATTPROT
-printk(KERN_INFO "Battery Temperature is normal. DeActivating protection.\n");
-AVPFREQ = oldavp_batt;
-GPUFREQ = oldgpu_batt;
-VDEFREQ = oldvde_batt;
-SCREENOFFFREQ = oldsmfreq_batt;
+otf_prot_deactivate();
 #endif
 						}
 					}
@@ -2395,15 +2385,7 @@ SCREENOFFFREQ = oldsmfreq_batt;
 				else
 					batt_dev->batt_health = POWER_SUPPLY_HEALTH_OVERHEAT;
 #ifdef CONFIG_OTF_BATTPROT
-oldavp_batt = AVPFREQ;
-oldgpu_batt = GPUFREQ;
-oldvde_batt = VDEFREQ;
-oldsmfreq_batt = SCREENOFFFREQ;
-printk(KERN_ALERT "WARNING: Power Supply Health Overheat! Activating protection!\n");
-AVPFREQ = AVPLOW;
-GPUFREQ = GPULOW;
-VDEFREQ = VDELOW;
-SCREENOFFFREQ = SMFREQLOW;
+otf_prot_activate();
 #endif
 			}
 			break;
@@ -2426,11 +2408,7 @@ SCREENOFFFREQ = SMFREQLOW;
 							batt_dev->charger_state_machine = CHARGER_STATE_CHARGE;
 							charging_ic_active_for_recharge(CHG_IC_DEFAULT_MODE);
 #ifdef CONFIG_OTF_BATTPROT
-printk(KERN_INFO "Power Supply Temperature Lowered. DeActivating protection.\n");
-AVPFREQ = oldavp_batt;
-GPUFREQ = oldgpu_batt;
-VDEFREQ = oldvde_batt;
-SCREENOFFFREQ = oldsmfreq_batt;
+otf_prot_deactivate();
 #endif
 						}
 					}
@@ -2438,15 +2416,7 @@ SCREENOFFFREQ = oldsmfreq_batt;
 				else
 					batt_dev->batt_health = POWER_SUPPLY_HEALTH_CRITICAL_OVERHEAT;
 #ifdef CONFIG_OTF_BATTPROT
-oldavp_batt = AVPFREQ;
-oldgpu_batt = GPUFREQ;
-oldvde_batt = VDEFREQ;
-oldsmfreq_batt = SCREENOFFFREQ;
-printk(KERN_ALERT "WARNING: Power Supply Health Critical Overheat! Activating protection!\n");
-AVPFREQ = AVPLOW;
-GPUFREQ = GPULOW;
-VDEFREQ = VDELOW;
-SCREENOFFFREQ = SMFREQLOW;
+otf_prot_activate();
 #endif
 			}
 			break;
@@ -2469,11 +2439,7 @@ SCREENOFFFREQ = SMFREQLOW;
 							batt_dev->charger_state_machine = CHARGER_STATE_CHARGE;
 							charging_ic_active_for_recharge(batt_dev->charger_setting_chcomp);
 #ifdef CONFIG_OTF_BATTPROT
-printk(KERN_INFO "Power Supply Health Good. DeActivating protection.\n");
-AVPFREQ = oldavp_batt;
-GPUFREQ = oldgpu_batt;
-VDEFREQ = oldvde_batt;
-SCREENOFFFREQ = oldsmfreq_batt;
+otf_prot_deactivate();
 #endif
 						}
 					}
