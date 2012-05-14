@@ -27,6 +27,7 @@ static ssize_t avpfreq_read(struct device * dev, struct device_attribute * attr,
 	return sprintf(buf, "%d\n", avpfreq);
 }
 
+extern unsigned int nitro;
 static ssize_t avpfreq_write(struct device * dev, struct device_attribute * attr, const char * buf, size_t size)
 {
 	int data;
@@ -35,8 +36,16 @@ static ssize_t avpfreq_write(struct device * dev, struct device_attribute * attr
 	{
 		if (data != avpfreq)
 		{
-			avpfreq = min(max(data, MIN_AVPFREQ), MAX_AVPFREQ);
-			pr_info("AVPCONTROL threshold changed to %d\n", avpfreq);
+			if (nitro == 1)
+			{
+				avpfreq = MAX_AVPFREQ;
+				pr_info("NITRO Enabled! AVPCONTROL threshold changed to %d\n", avpfreq);
+			}
+			else
+			{
+				avpfreq = min(max(data, MIN_AVPFREQ), MAX_AVPFREQ);
+				pr_info("AVPCONTROL threshold changed to %d\n", avpfreq);
+			}
 		}
 	}
 	else

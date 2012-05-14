@@ -63,6 +63,7 @@ static ssize_t onminkhz_read(struct device * dev, struct device_attribute * attr
 	return sprintf(buf, "%d\n", onminkhz);
 }
 
+extern unsigned int nitro;
 static ssize_t onminkhz_write(struct device * dev, struct device_attribute * attr, const char * buf, size_t size)
 {
 	int data;
@@ -71,10 +72,20 @@ static ssize_t onminkhz_write(struct device * dev, struct device_attribute * att
 	{
 		if (data != onminkhz)
 		{
-			onminkhz = min(max(data, MIN_ONMINKHZ), MAX_ONMINKHZ);
-			/* LG variable get the new value */
-			NVRM_CPU1_ON_MIN_KHZ = onminkhz;
-			pr_info("CPU1_ON_MIN_KHZ threshold changed to %d\n", onminkhz);
+			if (nitro == 1)
+			{
+				onminkhz = 655000;
+				/* LG variable get the new value */
+				NVRM_CPU1_ON_MIN_KHZ = onminkhz;
+				pr_info("NITRO Enabled! CPU1_ON_MIN_KHZ threshold changed to %d\n", onminkhz);
+			}
+			else
+			{
+				onminkhz = min(max(data, MIN_ONMINKHZ), MAX_ONMINKHZ);
+				/* LG variable get the new value */
+				NVRM_CPU1_ON_MIN_KHZ = onminkhz;
+				pr_info("CPU1_ON_MIN_KHZ threshold changed to %d\n", onminkhz);
+			}
 		}
 	}
 	else
@@ -113,10 +124,20 @@ static ssize_t offmaxkhz_write(struct device * dev, struct device_attribute * at
 	{
 		if (data != offmaxkhz)
 		{
-			offmaxkhz = min(max(data, MIN_OFFMAXKHZ), MAX_OFFMAXKHZ);
-			/* LG variable get the new value */
-			NVRM_CPU1_OFF_MAX_KHZ = offmaxkhz;
-			pr_info("CPU1_OFF_MAX_KHZ threshold changed to %d\n", offmaxkhz);
+			if (nitro == 1)
+			{
+				offmaxkhz = 610000;
+				/* LG variable get the new value */
+				NVRM_CPU1_OFF_MAX_KHZ = offmaxkhz;
+				pr_info("NITRO Enabled! CPU1_OFF_MAX_KHZ threshold changed to %d\n", offmaxkhz);
+			}
+			else
+			{
+				offmaxkhz = min(max(data, MIN_OFFMAXKHZ), MAX_OFFMAXKHZ);
+				/* LG variable get the new value */
+				NVRM_CPU1_OFF_MAX_KHZ = offmaxkhz;
+				pr_info("CPU1_OFF_MAX_KHZ threshold changed to %d\n", offmaxkhz);
+			}
 		}
 	}
 	else
@@ -155,10 +176,20 @@ static ssize_t ondelay_write(struct device * dev, struct device_attribute * attr
 	{
 		if (data != ondelay)
 		{
-			ondelay = min(max(data, MIN_ONDELAY), MAX_ONDELAY);
-			/* LG variable get the new value */
-			NVRM_CPU1_ON_PENDING_MS = ondelay;
-			pr_info("CPU1_ON_PENDING_MS threshold changed to %d\n", ondelay);
+			if (nitro == 1)
+			{
+				ondelay = MIN_ONDELAY;
+				/* LG variable get the new value */
+				NVRM_CPU1_ON_PENDING_MS = ondelay;
+				pr_info("NITRO Enabled! CPU1_ON_PENDING_MS threshold changed to %d\n", ondelay);
+			}
+			else
+			{
+				ondelay = min(max(data, MIN_ONDELAY), MAX_ONDELAY);
+				/* LG variable get the new value */
+				NVRM_CPU1_ON_PENDING_MS = ondelay;
+				pr_info("CPU1_ON_PENDING_MS threshold changed to %d\n", ondelay);
+			}
 		}
 	}
 	else
@@ -197,10 +228,20 @@ static ssize_t offdelay_write(struct device * dev, struct device_attribute * att
 	{
 		if (data != offdelay)
 		{
-			offdelay = min(max(data, MIN_OFFDELAY), MAX_OFFDELAY);
-			/* LG variable get the new value */
-			NVRM_CPU1_OFF_PENDING_MS = offdelay;
-			pr_info("CPU1_OFF_PENDING_MS threshold changed to %d\n", offdelay);
+			if (nitro == 1)
+			{
+				offdelay = MIN_OFFDELAY;
+				/* LG variable get the new value */
+				NVRM_CPU1_OFF_PENDING_MS = offdelay;
+				pr_info("NITRO Enabled! CPU1_OFF_PENDING_MS threshold changed to %d\n", offdelay);
+			}
+			else
+			{
+				offdelay = min(max(data, MIN_OFFDELAY), MAX_OFFDELAY);
+				/* LG variable get the new value */
+				NVRM_CPU1_OFF_PENDING_MS = offdelay;
+				pr_info("CPU1_OFF_PENDING_MS threshold changed to %d\n", offdelay);
+			}
 		}
 	}
 	else

@@ -366,9 +366,9 @@ NvRmPrivClockLimitsInit(NvRmDeviceHandle hRmDevice)
     // Set 3D upper clock boundary with combined Absolute/Scaled limit.
 
 #ifdef CONFIG_OTF
-    TDMaxKHz = GPUFREQ; // pSKUedLimits->TDMaxKHz;
+    TDMaxKHz = gpufreq; // pSKUedLimits->TDMaxKHz;
     TDMaxKHz = NV_MIN(TDMaxKHz, s_ClockRangeLimits[NvRmModuleID_3D].MaxKHz);
-    s_ClockRangeLimits[NvRmModuleID_3D].MaxKHz = GPUFREQ;
+    s_ClockRangeLimits[NvRmModuleID_3D].MaxKHz = gpufreq;
 #else
     TDMaxKHz = pSKUedLimits->TDMaxKHz;
     TDMaxKHz = NV_MIN(TDMaxKHz, s_ClockRangeLimits[NvRmModuleID_3D].MaxKHz);
