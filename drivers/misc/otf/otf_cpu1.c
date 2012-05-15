@@ -18,10 +18,6 @@
  * You need to undef or comment out the original LG definitions
  * in 'arch/arm/mach-tegra/nvrm/core/ap20/ap20rm_power_dfs.h'
  */
-unsigned int NVRM_CPU1_ON_MIN_KHZ;
-unsigned int NVRM_CPU1_OFF_MAX_KHZ;
-unsigned int NVRM_CPU1_ON_PENDING_MS;
-unsigned int NVRM_CPU1_OFF_PENDING_MS;
 
 /** Static containers */
 /*
@@ -32,20 +28,21 @@ unsigned int NVRM_CPU1_OFF_PENDING_MS;
  *   OFFDELAY time in a row
  */
 static unsigned int MIN_ONMINKHZ  = 216000;	/* Minimum ON_MIN_KHZ value     */
-static unsigned int MAX_ONMINKHZ  = 1015000;	/* Maximum ON_MIN_KHZ value     */
+static unsigned int MAX_ONMINKHZ  = 1000000;	/* Maximum ON_MIN_KHZ value     */
 static unsigned int DEF_ONMINKHZ  = 816000;	/* Default ON_MIN_KHZ value     */
 
-static unsigned int MIN_ONDELAY   = 300;	/* Minimum ON_PENDING_MS value  */
+static unsigned int MIN_ONDELAY   = 200;	/* Minimum ON_PENDING_MS value  */
 static unsigned int MAX_ONDELAY   = 2500;	/* Maximum ON_PENDING_MS value  */
 static unsigned int DEF_ONDELAY   = 2000;	/* Default ON_PENDING_MS value  */
 
 static unsigned int MIN_OFFMAXKHZ = 216000;	/* Minimum OFF_MAX_KHZ value    */
-static unsigned int MAX_OFFMAXKHZ = 1015000;	/* Maximum OFF_MAX_KHZ value    */
+static unsigned int MAX_OFFMAXKHZ = 1000000;	/* Maximum OFF_MAX_KHZ value    */
 static unsigned int DEF_OFFMAXKHZ = 860000;	/* Default OFF_MAX_KHZ value    */
 
-static unsigned int MIN_OFFDELAY  = 300;	/* Mininum OFF_PENDING_MS value */
+static unsigned int MIN_OFFDELAY  = 200;	/* Mininum OFF_PENDING_MS value */
 static unsigned int MAX_OFFDELAY  = 2000;	/* Maximum OFF_PENDING_MS value */
 static unsigned int DEF_OFFDELAY  = 1000;	/* Default OFF_PENDING_MS value */
+
 /** Static containers end */
 
 /* Boot time values */
@@ -54,45 +51,43 @@ unsigned int ondelay   = 2000;			/* ON_PENDING_MS boot time value  */
 
 unsigned int offmaxkhz = 860000;		/* OFF_MAX_KHZ boot time value    */
 unsigned int offdelay  = 1000;			/* OFF_PENDING_MS boot time value */
+
+unsigned int NVRM_CPU1_ON_MIN_KHZ     = 816000;	/* ON_MIN_KHZ                     */
+unsigned int NVRM_CPU1_ON_PENDING_MS  = 2000;	/* ON_PENDING_MS                  */
+unsigned int NVRM_CPU1_OFF_MAX_KHZ    = 860000;	/* OFF_MAX_KHZ                    */
+unsigned int NVRM_CPU1_OFF_PENDING_MS = 1000;	/* OFF_PENDING_MS                 */
 /* Boot time values end */
 
 /** SYSFS */
+extern unsigned int nitro;
 /* ON_MIN_KHZ */
 static ssize_t onminkhz_read(struct device * dev, struct device_attribute * attr, char * buf)
 {
 	return sprintf(buf, "%d\n", onminkhz);
 }
 
-extern unsigned int nitro;
 static ssize_t onminkhz_write(struct device * dev, struct device_attribute * attr, const char * buf, size_t size)
 {
-	int data;
+	int dataonminkhz;
 
-	if (sscanf(buf, "%d\n", &data) == 1)
+	if (nitro != 1)
 	{
-		if (data != onminkhz)
+		if (sscanf(buf, "%d\n", &dataonminkhz) == 1)
 		{
-			if (nitro == 1)
+			if (dataonminkhz != onminkhz)
 			{
-				onminkhz = 655000;
-				/* LG variable get the new value */
-				NVRM_CPU1_ON_MIN_KHZ = onminkhz;
-				pr_info("NITRO Enabled! CPU1_ON_MIN_KHZ threshold changed to %d\n", onminkhz);
-			}
-			else
-			{
-				onminkhz = min(max(data, MIN_ONMINKHZ), MAX_ONMINKHZ);
+				onminkhz = min(max(dataonminkhz, MIN_ONMINKHZ), MAX_ONMINKHZ);
 				/* LG variable get the new value */
 				NVRM_CPU1_ON_MIN_KHZ = onminkhz;
 				pr_info("CPU1_ON_MIN_KHZ threshold changed to %d\n", onminkhz);
 			}
 		}
+		else
+		{
+			pr_info("CPU1_ON_MIN_KHZ invalid input\n");
+		}
+		return size;
 	}
-	else
-	{
-		pr_info("CPU1_ON_MIN_KHZ invalid input\n");
-	}
-	return size;
 }
 
 static ssize_t onminkhz_min(struct device * dev, struct device_attribute * attr, char * buf)
@@ -118,33 +113,26 @@ static ssize_t offmaxkhz_read(struct device * dev, struct device_attribute * att
 
 static ssize_t offmaxkhz_write(struct device * dev, struct device_attribute * attr, const char * buf, size_t size)
 {
-	int data;
+	int dataoffmaxkhz;
 
-	if (sscanf(buf, "%d\n", &data) == 1)
+	if (nitro == 0)
 	{
-		if (data != offmaxkhz)
+		if (sscanf(buf, "%d\n", &dataoffmaxkhz) == 1)
 		{
-			if (nitro == 1)
+			if (dataoffmaxkhz != offmaxkhz)
 			{
-				offmaxkhz = 610000;
-				/* LG variable get the new value */
-				NVRM_CPU1_OFF_MAX_KHZ = offmaxkhz;
-				pr_info("NITRO Enabled! CPU1_OFF_MAX_KHZ threshold changed to %d\n", offmaxkhz);
-			}
-			else
-			{
-				offmaxkhz = min(max(data, MIN_OFFMAXKHZ), MAX_OFFMAXKHZ);
+				offmaxkhz = min(max(dataoffmaxkhz, MIN_OFFMAXKHZ), MAX_OFFMAXKHZ);
 				/* LG variable get the new value */
 				NVRM_CPU1_OFF_MAX_KHZ = offmaxkhz;
 				pr_info("CPU1_OFF_MAX_KHZ threshold changed to %d\n", offmaxkhz);
 			}
 		}
+		else
+		{
+			pr_info("CPU1_OFF_MAX_KHZ invalid input\n");
+		}
+		return size;
 	}
-	else
-	{
-		pr_info("CPU1_OFF_MAX_KHZ invalid input\n");
-	}
-	return size;
 }
 
 static ssize_t offmaxkhz_min(struct device * dev, struct device_attribute * attr, char * buf)
@@ -170,33 +158,26 @@ static ssize_t ondelay_read(struct device * dev, struct device_attribute * attr,
 
 static ssize_t ondelay_write(struct device * dev, struct device_attribute * attr, const char * buf, size_t size)
 {
-	int data;
+	int dataondelay;
 
-	if (sscanf(buf, "%d\n", &data) == 1)
+	if (nitro == 0)
 	{
-		if (data != ondelay)
+		if (sscanf(buf, "%d\n", &dataondelay) == 1)
 		{
-			if (nitro == 1)
+			if (dataondelay != ondelay)
 			{
-				ondelay = MIN_ONDELAY;
-				/* LG variable get the new value */
-				NVRM_CPU1_ON_PENDING_MS = ondelay;
-				pr_info("NITRO Enabled! CPU1_ON_PENDING_MS threshold changed to %d\n", ondelay);
-			}
-			else
-			{
-				ondelay = min(max(data, MIN_ONDELAY), MAX_ONDELAY);
+				ondelay = min(max(dataondelay, MIN_ONDELAY), MAX_ONDELAY);
 				/* LG variable get the new value */
 				NVRM_CPU1_ON_PENDING_MS = ondelay;
 				pr_info("CPU1_ON_PENDING_MS threshold changed to %d\n", ondelay);
 			}
 		}
+		else
+		{
+			pr_info("CPU1_ON_PENDING_MS invalid input\n");
+		}
+		return size;
 	}
-	else
-	{
-		pr_info("CPU1_ON_PENDING_MS invalid input\n");
-	}
-	return size;
 }
 
 static ssize_t ondelay_min(struct device * dev, struct device_attribute * attr, char * buf)
@@ -222,33 +203,26 @@ static ssize_t offdelay_read(struct device * dev, struct device_attribute * attr
 
 static ssize_t offdelay_write(struct device * dev, struct device_attribute * attr, const char * buf, size_t size)
 {
-	int data;
+	int dataoffdelay;
 
-	if (sscanf(buf, "%d\n", &data) == 1)
+	if (nitro == 0)
 	{
-		if (data != offdelay)
+		if (sscanf(buf, "%d\n", &dataoffdelay) == 1)
 		{
-			if (nitro == 1)
+			if (dataoffdelay != offdelay)
 			{
-				offdelay = MIN_OFFDELAY;
-				/* LG variable get the new value */
-				NVRM_CPU1_OFF_PENDING_MS = offdelay;
-				pr_info("NITRO Enabled! CPU1_OFF_PENDING_MS threshold changed to %d\n", offdelay);
-			}
-			else
-			{
-				offdelay = min(max(data, MIN_OFFDELAY), MAX_OFFDELAY);
+				offdelay = min(max(dataoffdelay, MIN_OFFDELAY), MAX_OFFDELAY);
 				/* LG variable get the new value */
 				NVRM_CPU1_OFF_PENDING_MS = offdelay;
 				pr_info("CPU1_OFF_PENDING_MS threshold changed to %d\n", offdelay);
 			}
 		}
+		else
+		{
+			pr_info("CPU1_OFF_PENDING_MS invalid input\n");
+		}
+		return size;
 	}
-	else
-	{
-		pr_info("CPU1_OFF_PENDING_MS invalid input\n");
-	}
-	return size;
 }
 
 static ssize_t offdelay_min(struct device * dev, struct device_attribute * attr, char * buf)

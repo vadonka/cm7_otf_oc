@@ -13,14 +13,39 @@
 #include <linux/init.h>
 #include <linux/device.h>
 #include <linux/miscdevice.h>
+#include "otf.h"
 
 /* Static containers */
 static unsigned int MIN_NITRO = 0;
 static unsigned int MAX_NITRO = 1;
 static unsigned int DEF_NITRO = 0;
+static unsigned int onminkhznitro = 655000;
+static unsigned int ondelaynitro = 200;
+static unsigned int offmaxkhznitro = 610000;
+static unsigned int offdelaynitro = 200;
+static unsigned int avpfreqnitro = 280000;
+static unsigned int gpufreqnitro = 366000;
+static unsigned int vdefreqnitro = 700000;
 
 /* Boot time value */
 unsigned int nitro = 0;
+/* Boot time value end */
+
+extern unsigned int onminkhz;
+extern unsigned int ondelay;
+extern unsigned int offmaxkhz;
+extern unsigned int offdelay;
+extern unsigned int avpfreq;
+extern unsigned int gpufreq;
+extern unsigned int vdefreq;
+
+static unsigned int oldonminkhz;
+static unsigned int oldondelay;
+static unsigned int oldoffmaxkhz;
+static unsigned int oldoffdelay;
+static unsigned int oldavpfreq;
+static unsigned int oldgpufreq;
+static unsigned int oldvdefreq;
 
 static ssize_t nitro_read(struct device * dev, struct device_attribute * attr, char * buf)
 {
@@ -29,19 +54,83 @@ static ssize_t nitro_read(struct device * dev, struct device_attribute * attr, c
 
 static ssize_t nitro_write(struct device * dev, struct device_attribute * attr, const char * buf, size_t size)
 {
-	int data;
+	int datanitro;
 
-	if (sscanf(buf, "%d\n", &data) == 1)
+	if (sscanf(buf, "%d\n", &datanitro) == 1)
 	{
-		if (data != nitro)
+		if (datanitro != nitro)
 		{
-			nitro = min(max(data, MIN_NITRO), MAX_NITRO);
-			pr_info("NITROCONTROL enabled\n", nitro);
+			nitro = min(max(datanitro, MIN_NITRO), MAX_NITRO);
+			if (nitro == 1)
+			{
+				pr_info("NITRO enabled\n", nitro);
+
+				oldonminkhz = onminkhz;
+				onminkhz = onminkhznitro;
+				NVRM_CPU1_ON_MIN_KHZ = onminkhz;
+				pr_info("NITRO Enabled! CPU1_ON_MIN_KHZ threshold changed to %d\n", onminkhz);
+
+				oldondelay = ondelay;
+				ondelay = ondelaynitro;
+				NVRM_CPU1_ON_PENDING_MS = ondelay;
+				pr_info("NITRO Enabled! CPU1_ON_PENDING_MS threshold changed to %d\n", ondelay);
+
+				oldoffmaxkhz = offmaxkhz;
+				offmaxkhz = offmaxkhznitro;
+				NVRM_CPU1_OFF_MAX_KHZ = offmaxkhz;
+				pr_info("NITRO Enabled! CPU1_OFF_MAX_KHZ threshold changed to %d\n", offmaxkhz);
+
+				oldoffdelay = offdelay;
+				offdelay = offdelaynitro;
+				NVRM_CPU1_OFF_PENDING_MS = offdelay;
+				pr_info("NITRO Enabled! CPU1_OFF_PENDING_MS threshold changed to %d\n", offdelay);
+
+				oldavpfreq = avpfreq;
+				avpfreq = avpfreqnitro;
+				pr_info("NITRO Enabled! AVPCONTROL threshold changed to %d\n", avpfreq);
+
+				oldgpufreq = gpufreq;
+				gpufreq = gpufreqnitro;
+				pr_info("NITRO Enabled! GPUCONTROL threshold changed to %d\n", gpufreq);
+
+				oldvdefreq = vdefreq;
+				vdefreq = vdefreqnitro;
+				pr_info("NITRO Enabled! VDECONTROL threshold changed to %d\n", vdefreq);
+			}
+			else
+			{
+				pr_info("NITRO disabled\n", nitro);
+
+				onminkhz = oldonminkhz;
+				NVRM_CPU1_ON_MIN_KHZ = onminkhz;
+				pr_info("CPU1_ON_MIN_KHZ threshold restored to %d\n", onminkhz);
+
+				ondelay = oldondelay;
+				NVRM_CPU1_ON_PENDING_MS = ondelay;
+				pr_info("CPU1_ON_PENDING_MS threshold restored to %d\n", ondelay);
+
+				offmaxkhz = oldoffmaxkhz;
+				NVRM_CPU1_OFF_MAX_KHZ = offmaxkhz;
+				pr_info("CPU1_OFF_MAX_KHZ threshold restored to %d\n", offmaxkhz);
+
+				offdelay = oldoffdelay;
+				NVRM_CPU1_OFF_PENDING_MS = offdelay;
+				pr_info("CPU1_OFF_PENDING_MS threshold restored to %d\n", offdelay);
+
+				avpfreq = oldavpfreq;
+				pr_info("AVPCONTROL threshold restored to %d\n", avpfreq);
+
+				gpufreq = oldgpufreq;
+				pr_info("GPUCONTROL threshold restored to %d\n", gpufreq);
+
+				vdefreq = oldvdefreq;
+				pr_info("VDECONTROL threshold restored to %d\n", vdefreq);
+			}
 		}
 	}
 	else
 	{
-		pr_info("NITROCONTROL invalid input\n");
+		pr_info("NITRO invalid input\n");
 	}
 	return size;
 }

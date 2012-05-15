@@ -9,9 +9,6 @@
 #undef CONFIG_CFS_BOOST
 #define CFS_BOOST_NICE -15
 
-extern void suspend_prepare_freq(void);
-extern void resume_prepare_freq(void);
-
 extern unsigned int NVRM_CPU1_ON_MIN_KHZ;
 extern unsigned int NVRM_CPU1_OFF_MAX_KHZ;
 extern unsigned int NVRM_CPU1_ON_PENDING_MS;

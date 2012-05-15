@@ -29,13 +29,13 @@ static ssize_t scroffmaxfreq_read(struct device * dev, struct device_attribute *
 
 static ssize_t scroffmaxfreq_write(struct device * dev, struct device_attribute * attr, const char * buf, size_t size)
 {
-	int data;
+	int datascoff;
 
-	if (sscanf(buf, "%d\n", &data) == 1)
+	if (sscanf(buf, "%d\n", &datascoff) == 1)
 	{
-		if (data != scroffmaxfreq)
+		if (datascoff != scroffmaxfreq)
 		{
-			scroffmaxfreq = min(max(data, MIN_SCROFFMAXFREQ), MAX_SCROFFMAXFREQ);
+			scroffmaxfreq = min(max(datascoff, MIN_SCROFFMAXFREQ), MAX_SCROFFMAXFREQ);
 			pr_info("SCROFFMAXCONTROL threshold changed to %d\n", scroffmaxfreq);
 		}
 	}
